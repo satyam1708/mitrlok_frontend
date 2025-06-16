@@ -1,9 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-export default function ResetPassword() {
+export const dynamic = "force-dynamic";
+
+function ResetPasswordContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
@@ -76,10 +78,7 @@ export default function ResetPassword() {
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label
-                htmlFor="newPassword"
-                className="block font-medium text-gray-700"
-              >
+              <label htmlFor="newPassword" className="block font-medium text-gray-700">
                 New Password
               </label>
               <input
@@ -95,10 +94,7 @@ export default function ResetPassword() {
             </div>
 
             <div>
-              <label
-                htmlFor="confirmPassword"
-                className="block font-medium text-gray-700"
-              >
+              <label htmlFor="confirmPassword" className="block font-medium text-gray-700">
                 Confirm Password
               </label>
               <input
@@ -127,5 +123,13 @@ export default function ResetPassword() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function ResetPassword() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ResetPasswordContent />
+    </Suspense>
   );
 }
