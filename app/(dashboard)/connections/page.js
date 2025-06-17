@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -26,16 +27,10 @@ export default function ConnectionsPage() {
       let endpoint = '';
 
       if (tab === 'requests') {
-        // GET /follow/requests
-        // Returns follow requests sent TO current user, with fromUser info
         endpoint = '/follow/requests';
       } else if (tab === 'discover') {
-        // GET /users/to-follow
-        // Returns users that current user can discover/follow
         endpoint = '/users/to-follow';
       } else if (tab === 'connections') {
-        // GET /follow/connections
-        // Returns users the current user is following (your connections)
         endpoint = '/follow/connections';
       }
 
@@ -46,7 +41,6 @@ export default function ConnectionsPage() {
         },
       });
 
-      // Defensive: API may return 'users' or 'requests' array
       const dataList = res.data.users || res.data.requests || [];
       setUsers(dataList);
       setMessage('');
@@ -59,10 +53,8 @@ export default function ConnectionsPage() {
     }
   };
 
-  // Refetch when tab changes or filters change (optional debounce recommended)
   useEffect(() => {
     if (token) {
-      // Reset filters when tab changes (optional)
       setFilters({
         name: '',
         city: '',
@@ -83,7 +75,6 @@ export default function ConnectionsPage() {
     fetchUsers();
   };
 
-  // POST /follow/request/:toUserId
   const handleFollowRequest = async (toUserId) => {
     try {
       const res = await axios.post(
@@ -100,7 +91,6 @@ export default function ConnectionsPage() {
     }
   };
 
-  // POST /unfollow/:userId
   const handleUnfollow = async (userId) => {
     try {
       await axios.post(
@@ -115,10 +105,7 @@ export default function ConnectionsPage() {
     }
   };
 
-  // POST /follow/accept/:requestId
   const handleAccept = async (requestId) => {
-    console.log(requestId)
-    console.log(typeof(requestId))
     try {
       await axios.post(
         `${API_URL}/follow/accept/${requestId}`,
@@ -133,7 +120,6 @@ export default function ConnectionsPage() {
     }
   };
 
-  // POST /follow/decline/:requestId
   const handleDecline = async (requestId) => {
     try {
       await axios.post(
@@ -149,143 +135,153 @@ export default function ConnectionsPage() {
   };
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6">Connections</h1>
-
+    <div className="p-4 sm:p-6 max-w-7xl mx-auto min-h-[80vh]">
       {/* Tabs */}
-      <div className="flex gap-4 mb-6">
+      <div className="flex flex-wrap gap-4 justify-center mb-8">
         {[
           { key: 'connections', label: 'Your Connections' },
           { key: 'requests', label: 'Follow Requests' },
           { key: 'discover', label: 'Discover People' },
         ].map(({ key, label }) => (
-          <button
+          <motion.button
             key={key}
             onClick={() => setTab(key)}
-            className={`px-4 py-2 rounded ${
-              tab === key ? 'bg-blue-600 text-white' : 'bg-gray-200 text-black'
+            className={`px-5 py-2 rounded-lg font-semibold shadow-md focus:outline-none whitespace-nowrap ${
+              tab === key
+                ? 'bg-blue-600 text-white shadow-blue-500/50'
+                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
             }`}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            layoutId={tab === key ? 'activeTab' : undefined}
           >
             {label}
-          </button>
+          </motion.button>
         ))}
       </div>
 
       {/* Filters */}
       <form
         onSubmit={handleFilterSubmit}
-        className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6"
+        className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-6 gap-4 mb-8 items-end"
       >
-        <input
-          name="name"
-          placeholder="Name"
-          value={filters.name}
-          onChange={handleInputChange}
-          className="border p-2 rounded"
-        />
-        <input
-          name="city"
-          placeholder="City"
-          value={filters.city}
-          onChange={handleInputChange}
-          className="border p-2 rounded"
-        />
-        <input
-          name="state"
-          placeholder="State"
-          value={filters.state}
-          onChange={handleInputChange}
-          className="border p-2 rounded"
-        />
-        <input
-          name="profession"
-          placeholder="Profession"
-          value={filters.profession}
-          onChange={handleInputChange}
-          className="border p-2 rounded"
-        />
-        <input
-          name="interests"
-          placeholder="Interests (comma)"
-          value={filters.interests}
-          onChange={handleInputChange}
-          className="border p-2 rounded"
-        />
-        <button
+        {['name', 'city', 'state', 'profession', 'interests'].map((field) => (
+          <motion.div key={field} layout>
+            <input
+              name={field}
+              placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
+              value={filters[field]}
+              onChange={handleInputChange}
+              className="border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none w-full transition"
+              autoComplete="off"
+            />
+          </motion.div>
+        ))}
+        <motion.button
           type="submit"
-          className="col-span-full md:col-span-1 bg-blue-500 text-white rounded px-4 py-2 hover:bg-blue-600"
+          className="bg-blue-600 text-white font-semibold rounded-lg px-6 py-3 shadow-md hover:bg-blue-700 transition w-full sm:w-auto"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          layout
         >
-          Apply
-        </button>
+          Apply Filters
+        </motion.button>
       </form>
 
       {/* Message */}
-      {message && <p className="mb-4 text-green-600 font-semibold">{message}</p>}
+      <AnimatePresence>
+        {message && (
+          <motion.p
+            className="mb-6 text-center text-green-600 font-semibold px-2"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+          >
+            {message}
+          </motion.p>
+        )}
+      </AnimatePresence>
 
       {/* Users List */}
       {loading ? (
-        <p>Loading...</p>
+        <p className="text-center text-gray-600 text-lg font-medium mt-12">Loading...</p>
       ) : users.length === 0 ? (
-        <p>No users found.</p>
+        <p className="text-center text-gray-500 text-lg mt-12">No users found.</p>
       ) : (
-        <ul className="grid gap-4 grid-cols-1 sm:grid-cols-2">
-          {users.map((userOrRequest) => {
-            // For requests tab, user is inside fromUser
-            const user = tab === 'requests' ? userOrRequest.fromUser : userOrRequest;
-            if (!user) return null; // Defensive check
+        <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <AnimatePresence>
+            {users.map((userOrRequest) => {
+              const user = tab === 'requests' ? userOrRequest.fromUser : userOrRequest;
+              if (!user) return null;
 
-            return (
-              <li
-                key={user.id}
-                className="p-4 border rounded shadow-sm flex justify-between items-center"
-              >
-                <div>
-                  <p className="text-lg font-semibold">{user.name}</p>
-                  <p className="text-sm text-gray-600">{user.profession}</p>
-                  <p className="text-sm">
-                    {user.city}, {user.state}
-                  </p>
-                  <p className="text-xs mt-1 text-gray-500">
-                    Interests: {user.interests?.join(', ') || 'N/A'}
-                  </p>
-                </div>
+              return (
+                <motion.li
+                  key={user.id}
+                  layout
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 15 }}
+                  className="p-5 border border-gray-200 rounded-lg shadow hover:shadow-lg transition-shadow bg-white flex flex-col justify-between"
+                >
+                  <div>
+                    <p className="text-lg sm:text-xl font-semibold text-blue-700 mb-1 truncate">{user.name}</p>
+                    <p className="text-sm sm:text-base text-gray-600 mb-1 truncate">{user.profession || 'N/A'}</p>
+                    <p className="text-sm text-gray-500 mb-1">
+                      {user.city || 'Unknown'}, {user.state || 'Unknown'}
+                    </p>
+                    <p className="text-xs text-gray-400 italic truncate" title={`Interests: ${user.interests?.join(', ') || 'N/A'}`}>
+                      Interests: {user.interests?.length ? user.interests.join(', ') : 'N/A'}
+                    </p>
+                  </div>
 
-                <div className="flex flex-col gap-2">
-                  {tab === 'requests' ? (
-                    <>
-                      <button
-                        onClick={() => handleAccept(userOrRequest.id)}
-                        className="bg-green-500 text-white px-4 py-1 rounded hover:bg-green-600"
+                  <div className="mt-4 flex gap-3 justify-end flex-wrap">
+                    {tab === 'requests' ? (
+                      <>
+                        <motion.button
+                          onClick={() => handleAccept(userOrRequest.id)}
+                          className="bg-green-600 text-white px-4 py-2 rounded-lg shadow hover:bg-green-700 transition"
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          aria-label={`Accept follow request from ${user.name}`}
+                        >
+                          Accept
+                        </motion.button>
+                        <motion.button
+                          onClick={() => handleDecline(userOrRequest.id)}
+                          className="bg-red-600 text-white px-4 py-2 rounded-lg shadow hover:bg-red-700 transition"
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          aria-label={`Decline follow request from ${user.name}`}
+                        >
+                          Decline
+                        </motion.button>
+                      </>
+                    ) : tab === 'connections' ? (
+                      <motion.button
+                        onClick={() => handleUnfollow(user.id)}
+                        className="bg-red-600 text-white px-5 py-2 rounded-lg shadow hover:bg-red-700 transition"
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        aria-label={`Unfollow ${user.name}`}
                       >
-                        Accept
-                      </button>
-                      <button
-                        onClick={() => handleDecline(userOrRequest.id)}
-                        className="bg-red-500 text-white px-4 py-1 rounded hover:bg-red-600"
+                        Unfollow
+                      </motion.button>
+                    ) : (
+                      <motion.button
+                        onClick={() => handleFollowRequest(user.id)}
+                        className="bg-blue-600 text-white px-5 py-2 rounded-lg shadow hover:bg-blue-700 transition"
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        aria-label={`Follow ${user.name}`}
                       >
-                        Decline
-                      </button>
-                    </>
-                  ) : tab === 'connections' ? (
-                    <button
-                      onClick={() => handleUnfollow(user.id)}
-                      className="bg-red-500 text-white px-4 py-1 rounded hover:bg-red-600"
-                    >
-                      Unfollow
-                    </button>
-                  ) : (
-                    // discover tab
-                    <button
-                      onClick={() => handleFollowRequest(user.id)}
-                      className="bg-green-500 text-white px-4 py-1 rounded hover:bg-green-600"
-                    >
-                      Follow
-                    </button>
-                  )}
-                </div>
-              </li>
-            );
-          })}
+                        Follow
+                      </motion.button>
+                    )}
+                  </div>
+                </motion.li>
+              );
+            })}
+          </AnimatePresence>
         </ul>
       )}
     </div>

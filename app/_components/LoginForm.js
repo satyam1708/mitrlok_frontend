@@ -11,6 +11,7 @@ function LoginForm() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setError("");
 
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/login`, {
@@ -20,87 +21,89 @@ function LoginForm() {
       });
 
       const data = await res.json();
+      if (!res.ok) return setError(data.message || "Login failed");
 
-      if (!res.ok) {
-        setError(data.message || "Login failed");
-        return;
-      }
-
-      // Save token and user details to localStorage
       localStorage.setItem("token", data.token);
-      localStorage.setItem("userId", data.user.id); // or data.user._id if using MongoDB
+      localStorage.setItem("userId", data.user.id);
       localStorage.setItem("userName", data.user.name);
       localStorage.setItem("userEmail", data.user.email);
       localStorage.setItem("userImage", data.user.profileImage || "");
 
       router.push("/home");
-    } catch (err) {
+    } catch {
       setError("Something went wrong");
-      console.error(err);
     }
   };
 
+  const inputClass =
+    "w-full px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0593a5] focus:border-transparent transition text-sm";
+
   return (
-    <div className="flex justify-center items-center h-full w-full">
-      <div className="bg-[#5aebeb] p-8 rounded-lg shadow-lg w-full max-w-[350px]">
-        <form className="space-y-5" onSubmit={handleLogin}>
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#038d8d] focus:border-transparent transition"
-            required
-          />
+    <div className="flex justify-center items-center h-full w-full px-4 sm:px-6">
+      <form
+        onSubmit={handleLogin}
+        className="bg-white dark:bg-gray-900 p-5 sm:p-6 md:p-8 rounded-xl shadow-md max-w-sm w-full space-y-4"
+        noValidate
+      >
+        <h2 className="text-lg sm:text-xl font-semibold text-center text-gray-800 dark:text-gray-100">
+          Sign In to MitrLok
+        </h2>
 
-          <div>
-            <input
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#038d8d] focus:border-transparent transition"
-              required
-            />
-            <div className="text-right mt-2">
-              <button
-                type="button"
-                onClick={() => router.push("/forgot-password")}
-                className="text-sm text-[#034747] hover:text-[#026262] font-semibold"
-              >
-                Forgot Password?
-              </button>
-            </div>
-          </div>
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className={inputClass}
+          required
+          autoComplete="email"
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          className={inputClass}
+          required
+          autoComplete="current-password"
+        />
 
-          {error && (
-            <div className="text-red-600 font-semibold text-sm text-center">
-              {error}
-            </div>
-          )}
-
-          <button
-            type="submit"
-            className="w-full bg-[#0593a5] text-white py-3 rounded-md hover:bg-[#037a7a] transition font-semibold text-lg"
-          >
-            Sign In
-          </button>
-
-          <div className="flex items-center my-4">
-            <hr className="flex-grow border-gray-400" />
-            <span className="mx-3 text-[#034747] font-semibold">OR</span>
-            <hr className="flex-grow border-gray-400" />
-          </div>
-
+        <div className="flex flex-col sm:flex-row justify-between items-center text-sm space-y-2 sm:space-y-0">
           <button
             type="button"
-            onClick={() => router.push("/register")}
-            className="w-full border-2 border-[#0593a5] text-[#0593a5] py-3 rounded-md hover:bg-[#0593a5] hover:text-white transition font-semibold text-lg"
+            onClick={() => router.push("/forgot-password")}
+            className="text-[#0593a5] hover:text-[#037a7a] font-semibold"
           >
-            Create an Account
+            Forgot Password?
           </button>
-        </form>
-      </div>
+          {error && (
+            <p className="text-red-600 font-semibold text-xs max-w-full sm:max-w-xs truncate">
+              {error}
+            </p>
+          )}
+        </div>
+
+        <button
+          type="submit"
+          className="w-full bg-[#0593a5] hover:bg-[#037a7a] text-white py-2 rounded-md font-semibold text-base transition-shadow shadow-md hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-[#037a7a]"
+        >
+          Sign In
+        </button>
+
+        <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
+          <hr className="flex-grow border-gray-300 dark:border-gray-600" />
+          <span className="mx-2 font-semibold select-none">OR</span>
+          <hr className="flex-grow border-gray-300 dark:border-gray-600" />
+        </div>
+
+        <button
+          type="button"
+          onClick={() => router.push("/register")}
+          className="w-full border-2 border-[#0593a5] text-[#0593a5] hover:bg-[#0593a5] hover:text-white py-2 rounded-md font-semibold text-base transition"
+        >
+          Create an Account
+        </button>
+      </form>
     </div>
   );
 }
