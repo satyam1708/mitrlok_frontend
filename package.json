@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "compress-images": "imagemin public/*.{jpg,png} --out-dir=public"
+    "compress-images": "node compress-images.js"
   },
   "dependencies": {
     "axios": "^1.9.0",
@@ -17,6 +17,7 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-icons": "^5.5.0",
+    "sharp": "^0.34.2",
     "socket.io-client": "^4.8.1"
   },
   "devDependencies": {
@@ -25,7 +26,6 @@
     "autoprefixer": "^10.4.21",
     "eslint": "^9",
     "eslint-config-next": "15.3.3",
-    "imagemin-cli": "^8.0.0",
     "postcss": "^8.5.4",
     "tailwindcss": "^4.1.8"
   }
