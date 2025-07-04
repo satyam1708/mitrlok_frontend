@@ -104,7 +104,7 @@ export default function ProfilePage() {
 
   if (error && !modalOpen) {
     return (
-      <div className="min-h-screen flex items-center justify-center px-4 bg-[#e0f2f1]">
+      <div className="min-h-screen flex items-center justify-center px-4 bg-gray-50">
         <p className="text-red-600 text-lg font-semibold">{error}</p>
       </div>
     );
@@ -112,7 +112,7 @@ export default function ProfilePage() {
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center px-4 bg-[#e0f2f1]">
+      <div className="min-h-screen flex items-center justify-center px-4 bg-gray-50">
         <p className="text-gray-500 text-lg font-medium">Loading profile...</p>
       </div>
     );
@@ -120,20 +120,23 @@ export default function ProfilePage() {
 
   return (
     <>
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-teal-50 to-teal-100 p-6">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: 'easeOut' }}
-          className="bg-white shadow-2xl rounded-3xl p-10 w-full max-w-3xl border border-teal-200"
+          className="bg-white shadow-lg rounded-3xl p-10 w-full max-w-3xl border border-gray-200"
           aria-live="polite"
           role="region"
         >
-          <h1 className="text-4xl font-extrabold text-teal-800 mb-10 text-center tracking-wide select-none">
-            Welcome, <span className="underline decoration-teal-400">{user.name}</span>
+          <h1 className="text-4xl font-extrabold text-slate-900 mb-10 text-center tracking-wide select-none">
+            Welcome,{' '}
+            <span className="underline decoration-sky-400 decoration-2">
+              {user.name}
+            </span>
           </h1>
 
-          <div className="grid gap-6 text-teal-900 text-base sm:text-lg">
+          <div className="grid gap-6 text-slate-800 text-base sm:text-lg">
             {[
               { label: 'Email', value: user.email },
               { label: 'Bio', value: user.bio || '—' },
@@ -152,36 +155,20 @@ export default function ProfilePage() {
             ))}
           </div>
 
-          {/* <div className="flex justify-center mt-12">
-            {user.profileImage ? (
-              <motion.img
-                src={user.profileImage}
-                alt={`${user.name}'s profile`}
-                className="w-32 h-32 rounded-full object-cover border-8 border-teal-300 shadow-md"
-                loading="lazy"
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ duration: 0.5 }}
-              />
-            ) : (
-              <div className="w-32 h-32 rounded-full flex items-center justify-center bg-teal-100 border-8 border-teal-300 shadow-md select-none text-teal-400 text-6xl font-bold">
-                {user.name?.[0].toUpperCase() || '?'}
-              </div>
-            )}
-          </div> */}
-
           <div className="flex flex-col sm:flex-row justify-center gap-6 mt-14">
             <button
               onClick={openModal}
-              className="px-10 py-3 rounded-full bg-teal-600 text-white font-semibold shadow-lg hover:bg-teal-700 focus:outline-none focus:ring-4 focus:ring-teal-300 transition"
+              className="px-10 py-3 rounded-full bg-sky-600 text-white font-semibold shadow-md hover:bg-sky-700 focus:outline-none focus:ring-4 focus:ring-sky-300 transition"
               aria-label="Edit Profile"
+              type="button"
             >
               Edit Profile
             </button>
             <button
               onClick={handleLogout}
-              className="px-10 py-3 rounded-full bg-red-600 text-white font-semibold shadow-lg hover:bg-red-700 focus:outline-none focus:ring-4 focus:ring-red-300 transition"
+              className="px-10 py-3 rounded-full bg-rose-600 text-white font-semibold shadow-md hover:bg-rose-700 focus:outline-none focus:ring-4 focus:ring-rose-300 transition"
               aria-label="Logout"
+              type="button"
             >
               Logout
             </button>
@@ -213,10 +200,10 @@ export default function ProfilePage() {
               aria-modal="true"
               aria-labelledby="editProfileTitle"
             >
-              <motion.div className="bg-white rounded-2xl p-8 w-full max-w-md shadow-2xl border border-teal-300">
+              <motion.div className="bg-white rounded-2xl p-8 w-full max-w-md shadow-lg border border-gray-300">
                 <h2
                   id="editProfileTitle"
-                  className="text-3xl font-bold mb-7 text-teal-700 text-center tracking-tight select-none"
+                  className="text-3xl font-bold mb-7 text-slate-900 text-center tracking-tight select-none"
                 >
                   Edit Profile
                 </h2>
@@ -245,7 +232,7 @@ export default function ProfilePage() {
                     >
                       <label
                         htmlFor={name}
-                        className="block text-sm font-semibold text-teal-700 mb-2 cursor-pointer select-none"
+                        className="block text-sm font-semibold text-slate-700 mb-2 cursor-pointer select-none"
                       >
                         {label}
                       </label>
@@ -256,7 +243,7 @@ export default function ProfilePage() {
                           value={formData[name]}
                           onChange={handleChange}
                           rows={3}
-                          className="w-full rounded-md border border-teal-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-teal-400 transition resize-none"
+                          className="w-full rounded-md border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-sky-400 transition resize-none"
                           placeholder={`Enter your ${label.toLowerCase()}`}
                         />
                       ) : (
@@ -266,7 +253,7 @@ export default function ProfilePage() {
                           name={name}
                           value={formData[name]}
                           onChange={handleChange}
-                          className="w-full rounded-md border border-teal-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-teal-400 transition"
+                          className="w-full rounded-md border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-sky-400 transition"
                           placeholder={`Enter your ${label.toLowerCase()}`}
                         />
                       )}
@@ -277,7 +264,7 @@ export default function ProfilePage() {
                     <motion.p
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
-                      className="text-red-600 text-center text-sm mt-3 select-none"
+                      className="text-rose-600 text-center text-sm mt-3 select-none"
                       role="alert"
                     >
                       {error}
@@ -296,13 +283,9 @@ export default function ProfilePage() {
                     <button
                       type="submit"
                       disabled={saving}
-                      className="px-6 py-3 rounded-lg bg-teal-600 text-white font-semibold hover:bg-teal-700 transition focus:outline-none focus:ring-2 focus:ring-teal-400"
+                      className="px-6 py-3 rounded-lg bg-sky-600 text-white font-semibold hover:bg-sky-700 transition focus:outline-none focus:ring-2 focus:ring-sky-400 flex items-center justify-center"
                     >
-                      {saving ? (
-                        <Spinner />
-                      ) : (
-                        'Save'
-                      )}
+                      {saving ? <Spinner /> : 'Save'}
                     </button>
                   </div>
                 </form>
@@ -318,12 +301,12 @@ export default function ProfilePage() {
 function ProfileRow({ label, value }) {
   return (
     <div
-      className="flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-teal-200 pb-4 last:border-0 hover:bg-teal-50 rounded-md transition"
+      className="flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-gray-200 pb-4 last:border-0 hover:bg-gray-50 rounded-md transition"
       tabIndex={0}
       aria-label={`${label}: ${value}`}
     >
-      <span className="font-semibold select-text">{label}:</span>
-      <span className="text-teal-800 mt-1 sm:mt-0 select-text">{value}</span>
+      <span className="font-semibold select-text text-slate-700">{label}:</span>
+      <span className="text-slate-900 mt-1 sm:mt-0 select-text">{value}</span>
     </div>
   );
 }
@@ -353,3 +336,9 @@ function Spinner() {
     </svg>
   );
 }
+
+
+// make this profile page such that it shows profile image and then name and friends count 
+// and below it there are tabs and it has his posts, About, Friends, Photos
+
+// and by default the posts is selected and it shows the post related to the user 

@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 
 export default function RegisterPage() {
   const router = useRouter();
-
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -16,9 +15,8 @@ export default function RegisterPage() {
     interests: "",
     profileImage: "",
   });
-
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -28,7 +26,7 @@ export default function RegisterPage() {
   const handleRegister = async (e) => {
     e.preventDefault();
     setError("");
-    setSuccess("");
+    setLoading(true);
 
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/signup`, {
@@ -44,16 +42,17 @@ export default function RegisterPage() {
       });
 
       const data = await res.json();
+      setLoading(false);
 
       if (!res.ok) {
         setError(data.message || "Signup failed");
         return;
       }
 
-      setSuccess("Signup successful! Redirecting to login...");
-      setTimeout(() => router.push("/login"), 1500);
+      router.push(`/verify?email=${form.email}`);
     } catch (err) {
       console.error(err);
+      setLoading(false);
       setError("Something went wrong");
     }
   };
@@ -86,14 +85,14 @@ export default function RegisterPage() {
             />
           ))}
 
-          {error && <p className="text-red-600 text-sm font-semibold text-center">{error}</p>}
-          {success && <p className="text-green-600 text-sm font-semibold text-center">{success}</p>}
+          {error && <p className="text-red-600 text-sm text-center">{error}</p>}
 
           <button
             type="submit"
             className="w-full bg-[#0593a5] text-white py-3 rounded-md hover:bg-[#037a7a] transition font-semibold text-lg"
+            disabled={loading}
           >
-            Register
+            {loading ? "Registering..." : "Register"}
           </button>
 
           <p className="text-center text-sm mt-4">

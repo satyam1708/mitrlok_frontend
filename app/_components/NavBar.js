@@ -9,9 +9,9 @@ import {
   FaComments,
   FaBell,
   FaUserCircle,
+  FaBars,
 } from "react-icons/fa";
-
-export default function NavBar() {
+export default function NavBar({ isSidebarOpen, setIsSidebarOpen, isMobile, sidebarWidth }) {
   const pathname = usePathname();
 
   const links = [
@@ -23,19 +23,39 @@ export default function NavBar() {
   ];
 
   return (
-    <nav className="bg-gradient-to-r from-[#c2eef4] to-[#a4d8e3] shadow-md sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between py-3">
-        {/* Left - Logo */}
-        <Link href="/home" className="flex items-center space-x-2 shrink-0">
-          <Image
-            src="/mitrlokimage.png"
-            alt="MitrLok Logo"
-            width={36}
-            height={36}
-            className="rounded-full"
-          />
-          <span className="text-xl font-bold text-[#037a7a] hidden sm:inline">MitrLok</span>
-        </Link>
+    <nav
+  className="fixed top-0 z-50 bg-gradient-to-r from-[#c2eef4] to-[#a4d8e3] shadow-md transition-all duration-300"
+  style={{
+    left: !isMobile ? sidebarWidth : 0,
+    width: !isMobile ? `calc(100% - ${sidebarWidth}px)` : "100%",
+    height: 64,
+  }}
+>
+      <div className="px-4 sm:px-6 lg:px-8 flex items-center justify-between h-full">
+        {/* Left - Logo & Toggle */}
+        <div className="flex items-center space-x-3">
+          {/* Hamburger for mobile */}
+          {isMobile && (
+            <button
+              onClick={() => setIsSidebarOpen(true)}
+              className="text-[#037a7a] mr-2 focus:outline-none"
+              aria-label="Open sidebar"
+            >
+              <FaBars size={22} />
+            </button>
+          )}
+
+          <Link href="/home" className="flex items-center space-x-2 shrink-0">
+            <Image
+              src="/mitrlokimage.png"
+              alt="MitrLok Logo"
+              width={36}
+              height={36}
+              className="rounded-full"
+            />
+            <span className="text-xl font-bold text-[#037a7a] hidden sm:inline">MitrLok</span>
+          </Link>
+        </div>
 
         {/* Right - Navigation Links */}
         <ul
@@ -48,7 +68,7 @@ export default function NavBar() {
             whitespace-nowrap
             flex-wrap
             sm:flex-nowrap
-            "
+          "
           aria-label="Primary Navigation"
         >
           {links.map(({ name, href, icon }) => {
@@ -67,7 +87,6 @@ export default function NavBar() {
                   `}
                 >
                   {icon}
-                  {/* Hide text on xs, show on sm+ */}
                   <span className="hidden sm:inline">{name}</span>
                 </Link>
               </li>

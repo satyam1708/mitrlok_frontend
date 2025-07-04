@@ -8,10 +8,12 @@ function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
+    setLoading(true);
 
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/login`, {
@@ -21,8 +23,20 @@ function LoginForm() {
       });
 
       const data = await res.json();
-      if (!res.ok) return setError(data.message || "Login failed");
+      setLoading(false);
 
+      // Handle error: email not verified
+      if (res.status === 403 && data.message === "Email not verified") {
+        router.push(`/verify?email=${email}`);
+        return;
+      }
+
+      if (!res.ok) {
+        setError(data.message || "Login failed");
+        return;
+      }
+
+      // Success
       localStorage.setItem("token", data.token);
       localStorage.setItem("userId", data.user.id);
       localStorage.setItem("userName", data.user.name);
@@ -30,8 +44,10 @@ function LoginForm() {
       localStorage.setItem("userImage", data.user.profileImage || "");
 
       router.push("/home");
-    } catch {
+    } catch (err) {
+      console.error(err);
       setError("Something went wrong");
+      setLoading(false);
     }
   };
 
@@ -86,8 +102,9 @@ function LoginForm() {
         <button
           type="submit"
           className="w-full bg-[#0593a5] hover:bg-[#037a7a] text-white py-2 rounded-md font-semibold text-base transition-shadow shadow-md hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-[#037a7a]"
+          disabled={loading}
         >
-          Sign In
+          {loading ? "Signing In..." : "Sign In"}
         </button>
 
         <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
