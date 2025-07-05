@@ -56,7 +56,9 @@ export default function HomePage() {
 
   useEffect(() => {
     if (token) fetchPosts(1);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetchPosts, token]);
+  
 
   const handlePostSubmit = async (e) => {
     e.preventDefault();

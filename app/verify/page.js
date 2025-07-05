@@ -1,7 +1,7 @@
 "use client";
 
 import React, { Suspense } from "react";
-import VerifyUI from "./VerifyUI";
+import VerifyUI from "../_components/VerifyUI";
 
 export default function VerifyPage() {
   return (

@@ -24,7 +24,8 @@ export default function NotificationsPage() {
     } catch (err) {
       console.error("Failed to fetch user ID", err);
     }
-  }, [API_URL]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   
   const fetchRequests = useCallback(async () => {
     try {
@@ -38,7 +39,8 @@ export default function NotificationsPage() {
     } finally {
       setLoading(false);
     }
-  }, [API_URL]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   
 
   const handleAccept = async (requestId) => {

@@ -69,7 +69,9 @@ export default function ConnectionsPage() {
 
   useEffect(() => {
     fetchUsers();
-  }, [fetchUsers]);
+  }, [fetchUsers, filters]);
+  
+  
   
 
   const handleInputChange = (e) => {

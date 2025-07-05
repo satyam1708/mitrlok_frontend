@@ -1,5 +1,4 @@
 import HomeClient from "./HomeClient";
-import { Metadata } from "next";
 
 const allImages = [
   "/img1.jpg",
