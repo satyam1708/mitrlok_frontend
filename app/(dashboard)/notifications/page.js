@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import axios from "axios";
 import io from "socket.io-client";
 import { useRouter } from "next/navigation";
@@ -14,20 +14,19 @@ export default function NotificationsPage() {
   const router = useRouter();
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
-
-  const fetchUserId = async () => {
+  const fetchUserId = useCallback(async () => {
     try {
       const token = localStorage.getItem("token");
       const res = await axios.get(`${API_URL}/auth/me`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      // You don’t need to store userId if unused here, but keep if needed
+      // Optional: handle res.data
     } catch (err) {
       console.error("Failed to fetch user ID", err);
     }
-  };
-
-  const fetchRequests = async () => {
+  }, [API_URL]);
+  
+  const fetchRequests = useCallback(async () => {
     try {
       const token = localStorage.getItem("token");
       const res = await axios.get(`${API_URL}/follow/requests`, {
@@ -39,7 +38,8 @@ export default function NotificationsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [API_URL]);
+  
 
   const handleAccept = async (requestId) => {
     try {

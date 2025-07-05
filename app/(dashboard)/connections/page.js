@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -18,60 +18,67 @@ export default function ConnectionsPage() {
   });
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
+  const [token, setToken] = useState(null);
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setToken(localStorage.getItem('token'));
+    }
+  }, []);
+  // Reset filters when tab changes
+  useEffect(() => {
+    setFilters({
+      name: '',
+      city: '',
+      state: '',
+      profession: '',
+      interests: '',
+    });
+  }, [tab]);
 
-  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+  const fetchUsers = useCallback(async () => {
+    if (!token) return;
+
+    try {
+      setLoading(true);
+      let endpoint = '';
+
+      if (tab === 'requests') {
+        endpoint = '/follow/requests';
+      } else if (tab === 'discover') {
+        endpoint = '/users/to-follow';
+      } else {
+        endpoint = '/follow/connections';
+      }
+
+      const res = await axios.get(`${API_URL}${endpoint}`, {
+        headers: { Authorization: `Bearer ${token}` },
+        params: { ...filters },
+      });
+
+      const dataList = res.data.users || res.data.requests || [];
+      setUsers(dataList);
+      setMessage('');
+    } catch (err) {
+      console.error(err);
+      setMessage('Error loading data');
+      setUsers([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [filters, tab, token]);
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        setLoading(true);
-        let endpoint = '';
-  
-        if (tab === 'requests') {
-          endpoint = '/follow/requests';
-        } else if (tab === 'discover') {
-          endpoint = '/users/to-follow';
-        } else {
-          endpoint = '/follow/connections';
-        }
-  
-        const res = await axios.get(`${API_URL}${endpoint}`, {
-          headers: { Authorization: `Bearer ${token}` },
-          params: { ...filters },
-        });
-  
-        const dataList = res.data.users || res.data.requests || [];
-        setUsers(dataList);
-        setMessage('');
-      } catch (err) {
-        console.error(err);
-        setMessage('Error loading data');
-        setUsers([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-  
-    if (token) {
-      setFilters({
-        name: '',
-        city: '',
-        state: '',
-        profession: '',
-        interests: '',
-      });
-      fetchUsers();
-    }
-  }, [tab, token]);
+    fetchUsers();
+  }, [fetchUsers]);
   
 
   const handleInputChange = (e) => {
     setFilters({ ...filters, [e.target.name]: e.target.value });
   };
 
-  const handleFilterSubmit = (e) => {
+  const handleFilterSubmit = async (e) => {
     e.preventDefault();
-    fetchUsers();
+    await fetchUsers();  // optional await
   };
 
   const handleFollowRequest = async (toUserId) => {

@@ -51,12 +51,12 @@ export default function HomePage() {
         setLoading(false);
       }
     },
-    [API_URL, token, userId]
+    [token, userId]
   );
 
   useEffect(() => {
     if (token) fetchPosts(1);
-  }, [token]);
+  }, [fetchPosts, token]);
 
   const handlePostSubmit = async (e) => {
     e.preventDefault();
