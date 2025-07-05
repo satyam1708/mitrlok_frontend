@@ -42,7 +42,7 @@ export default function MessagingPage() {
     }
     setToken(storedToken);
     setUserId(storedUserId);
-  }, []);
+  }, [router]);
 
   // Socket init and message receive
   useEffect(() => {
@@ -95,7 +95,7 @@ export default function MessagingPage() {
         }
       };
     }
-  }, [token, userId]);
+  }, [API_URL, token, userId]);
 
   // Fetch connections
   useEffect(() => {
@@ -106,7 +106,7 @@ export default function MessagingPage() {
       })
       .then((res) => setConnections(res.data.users))
       .catch((err) => console.error('Error fetching connections:', err));
-  }, [token, userId]);
+  }, [API_URL, token, userId]);
 
   // Fetch messages for selected user and page (pagination placeholder)
   useEffect(() => {
@@ -132,7 +132,7 @@ export default function MessagingPage() {
         setHasMore(newMsgs.length > 0); 
       })
       .catch((err) => console.error('Error fetching messages:', err));
-  }, [selectedUser, page]);
+  }, [selectedUser, page, API_URL, token]);
 
   const sendMessage = () => {
     if (!newMessage.trim() || !selectedUser) return;

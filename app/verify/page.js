@@ -92,7 +92,7 @@ export default function VerifyPage() {
         </form>
 
         <p className="text-center text-sm mt-4">
-          Didn't receive the OTP?{" "}
+          Didn&apos;t receive the OTP?{" "}
           <button
             className="text-[#0593a5] hover:underline font-semibold"
             onClick={handleResendOtp}

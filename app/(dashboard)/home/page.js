@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaImage, FaSmile, FaMapMarkerAlt, FaPlus } from "react-icons/fa";
+import Image from "next/image";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -17,36 +18,41 @@ export default function HomePage() {
   const [error, setError] = useState("");
   const [userName, setUserName] = useState("");
 
-  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
-  const userId = typeof window !== "undefined" ? localStorage.getItem("userId") : null;
+  const token =
+    typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  const userId =
+    typeof window !== "undefined" ? localStorage.getItem("userId") : null;
 
   useEffect(() => {
     const name = localStorage.getItem("userName") || "User";
     setUserName(name);
   }, []);
 
-  const fetchPosts = async (pageNumber = 1) => {
-    setLoading(true);
-    setError("");
+  const fetchPosts = useCallback(
+    async (pageNumber = 1) => {
+      setLoading(true);
+      setError("");
 
-    try {
-      const res = await axios.get(`${API_URL}/feed?page=${pageNumber}`, {
-        headers: { Authorization: `Bearer ${token}`, userId },
-      });
+      try {
+        const res = await axios.get(`${API_URL}/feed?page=${pageNumber}`, {
+          headers: { Authorization: `Bearer ${token}`, userId },
+        });
 
-      if (pageNumber === 1) {
-        setPosts(res.data.posts);
-      } else {
-        setPosts((prev) => [...prev, ...res.data.posts]);
+        if (pageNumber === 1) {
+          setPosts(res.data.posts);
+        } else {
+          setPosts((prev) => [...prev, ...res.data.posts]);
+        }
+
+        setPage(pageNumber);
+      } catch {
+        setError("Failed to load posts.");
+      } finally {
+        setLoading(false);
       }
-
-      setPage(pageNumber);
-    } catch {
-      setError("Failed to load posts.");
-    } finally {
-      setLoading(false);
-    }
-  };
+    },
+    [API_URL, token, userId]
+  );
 
   useEffect(() => {
     if (token) fetchPosts(1);
@@ -89,7 +95,7 @@ export default function HomePage() {
         <div className="w-10 h-10 bg-blue-200 text-blue-700 rounded-full flex items-center justify-center font-bold">
           {userName[0]}
         </div>
-        <p className="text-gray-500">What's on your mind, {userName}?</p>
+        <p className="text-gray-500">What&apos;s on your mind, {userName}?</p>
       </div>
 
       {/* Modal */}
@@ -158,8 +164,12 @@ export default function HomePage() {
 
       {/* Posts List */}
       <section className="mt-10">
-        {loading && <p className="text-center text-gray-600">Loading posts...</p>}
-        {!loading && posts.length === 0 && <p className="text-center text-gray-500">No posts to show.</p>}
+        {loading && (
+          <p className="text-center text-gray-600">Loading posts...</p>
+        )}
+        {!loading && posts.length === 0 && (
+          <p className="text-center text-gray-500">No posts to show.</p>
+        )}
 
         <ul className="space-y-6">
           <AnimatePresence>
@@ -175,22 +185,36 @@ export default function HomePage() {
               >
                 <div className="flex items-center space-x-4 mb-3">
                   {post.author.profileImage ? (
-                    <img src={post.author.profileImage} alt={post.author.name} className="w-10 h-10 rounded-full" />
+                    <Image
+                      src={post.author.profileImage}
+                      alt={post.author.name}
+                      width={40}
+                      height={40}
+                      className="w-10 h-10 rounded-full"
+                    />
                   ) : (
                     <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center text-gray-600">
                       {post.author.name[0]}
                     </div>
                   )}
                   <div>
-                    <p className="font-semibold text-sm text-gray-900">{post.author.name}</p>
-                    <p className="text-xs text-gray-400">{new Date(post.createdAt).toLocaleString()}</p>
+                    <p className="font-semibold text-sm text-gray-900">
+                      {post.author.name}
+                    </p>
+                    <p className="text-xs text-gray-400">
+                      {new Date(post.createdAt).toLocaleString()}
+                    </p>
                   </div>
                 </div>
-                <p className="text-sm text-gray-800 whitespace-pre-line">{post.content}</p>
+                <p className="text-sm text-gray-800 whitespace-pre-line">
+                  {post.content}
+                </p>
                 {post.imageUrl && (
-                  <img
+                  <Image
                     src={post.imageUrl}
                     alt="Post"
+                    width={800}
+                    height={600}
                     className="w-full mt-4 rounded-md max-h-80 object-contain"
                   />
                 )}

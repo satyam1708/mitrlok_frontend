@@ -21,39 +21,37 @@ export default function ConnectionsPage() {
 
   const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
 
-  const fetchUsers = async () => {
-    try {
-      setLoading(true);
-      let endpoint = '';
-
-      if (tab === 'requests') {
-        endpoint = '/follow/requests';
-      } else if (tab === 'discover') {
-        endpoint = '/users/to-follow';
-      } else if (tab === 'connections') {
-        endpoint = '/follow/connections';
-      }
-
-      const res = await axios.get(`${API_URL}${endpoint}`, {
-        headers: { Authorization: `Bearer ${token}` },
-        params: {
-          ...filters,
-        },
-      });
-
-      const dataList = res.data.users || res.data.requests || [];
-      setUsers(dataList);
-      setMessage('');
-    } catch (err) {
-      console.error(err);
-      setMessage('Error loading data');
-      setUsers([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        setLoading(true);
+        let endpoint = '';
+  
+        if (tab === 'requests') {
+          endpoint = '/follow/requests';
+        } else if (tab === 'discover') {
+          endpoint = '/users/to-follow';
+        } else {
+          endpoint = '/follow/connections';
+        }
+  
+        const res = await axios.get(`${API_URL}${endpoint}`, {
+          headers: { Authorization: `Bearer ${token}` },
+          params: { ...filters },
+        });
+  
+        const dataList = res.data.users || res.data.requests || [];
+        setUsers(dataList);
+        setMessage('');
+      } catch (err) {
+        console.error(err);
+        setMessage('Error loading data');
+        setUsers([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+  
     if (token) {
       setFilters({
         name: '',
@@ -64,7 +62,8 @@ export default function ConnectionsPage() {
       });
       fetchUsers();
     }
-  }, [tab]);
+  }, [tab, token]);
+  
 
   const handleInputChange = (e) => {
     setFilters({ ...filters, [e.target.name]: e.target.value });
